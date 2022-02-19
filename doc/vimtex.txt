@@ -1025,8 +1025,10 @@ OPTIONS                                                        *vimtex-options*
 
     let g:vimtex_compiler_latexmk_engines = {
         \ '_'                : '-pdf',
+        \ 'pdfdvi'           : '-pdfdvi',
+        \ 'pdfps'            : '-pdfps',
         \ 'pdflatex'         : '-pdf',
-        \ 'dvipdfex'         : '-pdfdvi',
+        \ 'luatex'           : '-lualatex',
         \ 'lualatex'         : '-lualatex',
         \ 'xelatex'          : '-xelatex',
         \ 'context (pdftex)' : '-pdf -pdflatex=texexec',
@@ -1450,10 +1452,19 @@ OPTIONS                                                        *vimtex-options*
   Default value: 0
 
 *g:vimtex_doc_handlers*
-  By default, package documentation is looked up online through
-  http://texdoc.net/pkg/packagename. With this option, one may specify a list
-  of custom handlers. A handler is a function that takes a single |Dict|
-  argument with the following keys:
+  With this option, one may specify a list of custom documentation handlers.
+  The following pre-made handlers are available:
+
+    'vimtex#doc#handler#texdoc'  Open documentation with local `texdoc`.
+    Fallback                     Open documentation online through
+                                 http://texdoc.net/pkg/packagename.
+
+  To use the local `texdoc`, set: >
+
+    let g:vimtex_doc_handlers = ['vimtex#doc#handlers#texdoc']
+<
+  A handler is a function that takes a single |Dict| argument with the
+  following keys:
 
     type~
       One of `documentclass`, `usepackage`, `command` or `word`.
@@ -1471,24 +1482,24 @@ OPTIONS                                                        *vimtex-options*
       not defined.
 
   Each handler in the list will be tried until a handler provides a return
-  value of 1. One may add handlers that only makes minor modifications of the
-  context and passes it on to the default handler, as well as handlers that
-  fully completes the lookup e.g. through a local lookup with `texdoc`.
+  value of 1 or |v:true|. One may thus add handlers that only makes minor
+  modifications of the context and passes it on to the next handler.
 
-  Note that the context may have multiple candidates, and that the handlers
-  are applied before any internal selection is made. Thus the `selected` key
-  may not defined. This allows the handler to perform the selection itself, or
-  one may manually call the selection function `vimtex#doc#make_selection` to
-  get a simple selection menu.
+  The context may have multiple candidates and the handlers are applied before
+  any internal selection is made. Thus the `selected` key may be not defined.
+  This allows the handler to perform the selection itself. One may manually
+  call the selection function `vimtex#doc#make_selection` to get a simple
+  selection menu.
 
-  The following example uses the local `texdoc` to open the documentation: >
+  The following shows a generic example of how to write a custom handler: >
 
     let g:vimtex_doc_handlers = ['MyHandler']
+
     function! MyHandler(context)
       call vimtex#doc#make_selection(a:context)
-      if !empty(a:context.selected)
-        execute '!texdoc' a:context.selected '&'
-      endif
+      if empty(a:context.selected) | return 0 | endif
+
+      execute '!myhandler' a:context.selected '&'
       return 1
     endfunction
 <
@@ -2186,8 +2197,10 @@ OPTIONS                                                        *vimtex-options*
   The following keys are available:
 
     accents~
-      Replace TeX accents into the accented character, e.g. `\aa` --> å. This
-      will also replace a few ligatures.
+      Conceal accented characters, e.g. `\^a` --> `â`.
+
+    ligatures~
+      Conceal ligatures such as `\aa` --> `å` and `''` --> `“`.
 
     cites~
       Conceal LaTeX cite commands such as `\citet[...]{ref00}`. The conceal
@@ -5354,12 +5367,21 @@ Note: Vim users should be aware that one may need to ensure that the server is
 LATEX DOCUMENTATION                                           *vimtex-latexdoc*
 
 VimTeX provides the command |:VimtexDocPackage| to open documentation for
-packages and documentclasses. The command is mapped to `K` by default, and by
-default package documentation is looked up through http://texdoc.net/. This
-can be customized through |g:vimtex_doc_handlers|.
+packages and documentclasses. The command is mapped to `K` by default.
 
-In the following, I list some alternative and relevant options for access to
-LaTeX documentation, both online and offline.
+For simplicity, the standard method provided by VimTeX is to look up
+documentation online through http://texdoc.net/. However, this can be
+customized with the option |g:vimtex_doc_handlers|. The option allows much
+flexibility for advanced users. For users that want to use a local `texdoc`
+installation as the main method, they may use the following config: >
+
+  let g:vimtex_doc_handlers = ['vimtex#doc#handlers#texdoc']
+<
+See https://www.tug.org/texdoc/doc/texdoc.pdf for more info about `texdoc`.
+
+In the following, I list some relevant online and offline alternatives for
+accessing LaTeX documentation. Please note that these methods are not
+integrated into VimTeX and are listed purely for the readers convenience.
 
 ------------------------------------------------------------------------------
 ONLINE                                                 *vimtex-latexdoc-online*
@@ -5386,15 +5408,8 @@ The above systems may be accessed from vim through dash.vim [3], zeavim.vim
 [4] or vim-dasht [5], respectively. Other alternative vim plugins include
 investigate.vim [6].
 
-A different option is to rely on texdoc [7]. If you specify e.g. in your
-`~/.vim/after/ftplugin/tex.vim` to use `setlocal keywordprg=texdoc`, then
-press |K| on a package name in `\usepackage{name}`, this will open the
-documentation pdf of this package. Note, though, that this assumes that the
-documentation is available offline, which it might not be (e.g. on Arch Linux
-it is not available through the texlive packages).
-
 The unofficial LaTeX(2e) reference manual (latexref) should also be mentioned,
-since it may be easily downloaded in various formats from [8].
+since it may be easily downloaded in various formats from [7].
 
 [0]: https://kapeli.com/dash
 [1]: https://zealdocs.org/
@@ -5403,8 +5418,7 @@ since it may be easily downloaded in various formats from [8].
 [4]: https://github.com/sunaku/vim-dasht
 [5]: https://github.com/KabbAmine/zeavim.vim
 [6]: https://github.com/keith/investigate.vim
-[7]: https://www.tug.org/texdoc/doc/texdoc.pdf
-[8]: https://latexref.xyz/dev/
+[7]: https://latexref.xyz/dev/
 
 ==============================================================================
 CONTEXT MENU                                              *vimtex-context-menu*

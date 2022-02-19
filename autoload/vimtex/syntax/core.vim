@@ -644,9 +644,14 @@ function! vimtex#syntax#core#init() abort " {{{1
       call s:match_conceal_greek()
     endif
 
-    " Conceal replace accented characters and ligatures
+    " Conceal replace accented characters
     if g:vimtex_syntax_conceal.accents
       call s:match_conceal_accents()
+    endif
+
+    " Conceal replace ligatures
+    if g:vimtex_syntax_conceal.ligatures
+      call s:match_conceal_ligatures()
     endif
 
     " Conceal cite commands
@@ -1487,6 +1492,7 @@ let s:cmd_symbols = [
       \ ['implies', '⇒'],
       \ ['choose', 'C'],
       \ ['sqrt', '√'],
+      \ ['colon', ':'],
       \ ['coloneqq', '≔'],
       \]
 
@@ -1751,27 +1757,27 @@ function! s:match_math_delims() abort " {{{1
   syntax match texMathDelimMod contained "\\\(left\|right\)\>"
   syntax match texMathDelimMod contained "\\[bB]igg\?[lr]\?\>"
   syntax match texMathDelim contained "[<>()[\]|/.]\|\\[{}|]"
-  syntax match texMathDelim contained "\\backslash"
-  syntax match texMathDelim contained "\\downarrow"
-  syntax match texMathDelim contained "\\Downarrow"
-  syntax match texMathDelim contained "\\[lr]vert"
-  syntax match texMathDelim contained "\\[lr]Vert"
-  syntax match texMathDelim contained "\\langle"
-  syntax match texMathDelim contained "\\lbrace"
-  syntax match texMathDelim contained "\\lceil"
-  syntax match texMathDelim contained "\\lfloor"
-  syntax match texMathDelim contained "\\lgroup"
-  syntax match texMathDelim contained "\\lmoustache"
-  syntax match texMathDelim contained "\\rangle"
-  syntax match texMathDelim contained "\\rbrace"
-  syntax match texMathDelim contained "\\rceil"
-  syntax match texMathDelim contained "\\rfloor"
-  syntax match texMathDelim contained "\\rgroup"
-  syntax match texMathDelim contained "\\rmoustache"
-  syntax match texMathDelim contained "\\uparrow"
-  syntax match texMathDelim contained "\\Uparrow"
-  syntax match texMathDelim contained "\\updownarrow"
-  syntax match texMathDelim contained "\\Updownarrow"
+  syntax match texMathDelim contained "\\backslash\>"
+  syntax match texMathDelim contained "\\downarrow\>"
+  syntax match texMathDelim contained "\\Downarrow\>"
+  syntax match texMathDelim contained "\\[lr]vert\>"
+  syntax match texMathDelim contained "\\[lr]Vert\>"
+  syntax match texMathDelim contained "\\langle\>"
+  syntax match texMathDelim contained "\\lbrace\>"
+  syntax match texMathDelim contained "\\lceil\>"
+  syntax match texMathDelim contained "\\lfloor\>"
+  syntax match texMathDelim contained "\\lgroup\>"
+  syntax match texMathDelim contained "\\lmoustache\>"
+  syntax match texMathDelim contained "\\rangle\>"
+  syntax match texMathDelim contained "\\rbrace\>"
+  syntax match texMathDelim contained "\\rceil\>"
+  syntax match texMathDelim contained "\\rfloor\>"
+  syntax match texMathDelim contained "\\rgroup\>"
+  syntax match texMathDelim contained "\\rmoustache\>"
+  syntax match texMathDelim contained "\\uparrow\>"
+  syntax match texMathDelim contained "\\Uparrow\>"
+  syntax match texMathDelim contained "\\updownarrow\>"
+  syntax match texMathDelim contained "\\Updownarrow\>"
 
   if !g:vimtex_syntax_conceal.math_delimiters || &encoding !=# 'utf-8'
     return
@@ -1781,8 +1787,8 @@ function! s:match_math_delims() abort " {{{1
   syntax match texMathDelim contained conceal cchar=| "\\right|"
   syntax match texMathDelim contained conceal cchar=‖ "\\left\\|"
   syntax match texMathDelim contained conceal cchar=‖ "\\right\\|"
-  syntax match texMathDelim contained conceal cchar=| "\\[lr]vert"
-  syntax match texMathDelim contained conceal cchar=‖ "\\[lr]Vert"
+  syntax match texMathDelim contained conceal cchar=| "\\[lr]vert\>"
+  syntax match texMathDelim contained conceal cchar=‖ "\\[lr]Vert\>"
   syntax match texMathDelim contained conceal cchar=( "\\left("
   syntax match texMathDelim contained conceal cchar=) "\\right)"
   syntax match texMathDelim contained conceal cchar=[ "\\left\["
@@ -1793,39 +1799,39 @@ function! s:match_math_delims() abort " {{{1
   syntax match texMathDelim contained conceal cchar=⟩ '\\rangle\>'
   syntax match texMathDelim contained conceal cchar=⌊ "\\lfloor\>"
   syntax match texMathDelim contained conceal cchar=⌋ "\\rfloor\>"
-  syntax match texMathDelim contained conceal cchar=< "\\\%([bB]igg\?l\|left\)<"
-  syntax match texMathDelim contained conceal cchar=> "\\\%([bB]igg\?r\|right\)>"
-  syntax match texMathDelim contained conceal cchar=( "\\\%([bB]igg\?l\|left\)("
-  syntax match texMathDelim contained conceal cchar=) "\\\%([bB]igg\?r\|right\))"
-  syntax match texMathDelim contained conceal cchar=[ "\\\%([bB]igg\?l\|left\)\["
-  syntax match texMathDelim contained conceal cchar=] "\\\%([bB]igg\?r\|right\)]"
-  syntax match texMathDelim contained conceal cchar={ "\\\%([bB]igg\?l\|left\)\\{"
-  syntax match texMathDelim contained conceal cchar=} "\\\%([bB]igg\?r\|right\)\\}"
-  syntax match texMathDelim contained conceal cchar=[ "\\\%([bB]igg\?l\|left\)\\lbrace"
-  syntax match texMathDelim contained conceal cchar=⌈ "\\\%([bB]igg\?l\|left\)\\lceil"
-  syntax match texMathDelim contained conceal cchar=⌊ "\\\%([bB]igg\?l\|left\)\\lfloor"
-  syntax match texMathDelim contained conceal cchar=⌊ "\\\%([bB]igg\?l\|left\)\\lgroup"
-  syntax match texMathDelim contained conceal cchar=⎛ "\\\%([bB]igg\?l\|left\)\\lmoustache"
-  syntax match texMathDelim contained conceal cchar=] "\\\%([bB]igg\?r\|right\)\\rbrace"
-  syntax match texMathDelim contained conceal cchar=⌉ "\\\%([bB]igg\?r\|right\)\\rceil"
-  syntax match texMathDelim contained conceal cchar=⌋ "\\\%([bB]igg\?r\|right\)\\rfloor"
-  syntax match texMathDelim contained conceal cchar=⌋ "\\\%([bB]igg\?r\|right\)\\rgroup"
-  syntax match texMathDelim contained conceal cchar=⎞ "\\\%([bB]igg\?r\|right\)\\rmoustache"
+  syntax match texMathDelim contained conceal cchar=< "\\\%([bB]igg\?l\?\|left\)<"
+  syntax match texMathDelim contained conceal cchar=> "\\\%([bB]igg\?r\?\|right\)>"
+  syntax match texMathDelim contained conceal cchar=( "\\\%([bB]igg\?l\?\|left\)("
+  syntax match texMathDelim contained conceal cchar=) "\\\%([bB]igg\?r\?\|right\))"
+  syntax match texMathDelim contained conceal cchar=[ "\\\%([bB]igg\?l\?\|left\)\["
+  syntax match texMathDelim contained conceal cchar=] "\\\%([bB]igg\?r\?\|right\)]"
+  syntax match texMathDelim contained conceal cchar={ "\\\%([bB]igg\?l\?\|left\)\\{"
+  syntax match texMathDelim contained conceal cchar=} "\\\%([bB]igg\?r\?\|right\)\\}"
+  syntax match texMathDelim contained conceal cchar=[ "\\\%([bB]igg\?l\?\|left\)\\lbrace\>"
+  syntax match texMathDelim contained conceal cchar=⌈ "\\\%([bB]igg\?l\?\|left\)\\lceil\>"
+  syntax match texMathDelim contained conceal cchar=⌊ "\\\%([bB]igg\?l\?\|left\)\\lfloor\>"
+  syntax match texMathDelim contained conceal cchar=⌊ "\\\%([bB]igg\?l\?\|left\)\\lgroup\>"
+  syntax match texMathDelim contained conceal cchar=⎛ "\\\%([bB]igg\?l\?\|left\)\\lmoustache\>"
+  syntax match texMathDelim contained conceal cchar=] "\\\%([bB]igg\?r\?\|right\)\\rbrace\>"
+  syntax match texMathDelim contained conceal cchar=⌉ "\\\%([bB]igg\?r\?\|right\)\\rceil\>"
+  syntax match texMathDelim contained conceal cchar=⌋ "\\\%([bB]igg\?r\?\|right\)\\rfloor\>"
+  syntax match texMathDelim contained conceal cchar=⌋ "\\\%([bB]igg\?r\?\|right\)\\rgroup\>"
+  syntax match texMathDelim contained conceal cchar=⎞ "\\\%([bB]igg\?r\?\|right\)\\rmoustache\>"
   syntax match texMathDelim contained conceal cchar=| "\\\%([bB]igg\?[lr]\?\|left\|right\)|"
   syntax match texMathDelim contained conceal cchar=‖ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\|"
-  syntax match texMathDelim contained conceal cchar=↓ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\downarrow"
-  syntax match texMathDelim contained conceal cchar=⇓ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Downarrow"
-  syntax match texMathDelim contained conceal cchar=↑ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\uparrow"
-  syntax match texMathDelim contained conceal cchar=↑ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Uparrow"
-  syntax match texMathDelim contained conceal cchar=↕ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\updownarrow"
-  syntax match texMathDelim contained conceal cchar=⇕ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Updownarrow"
+  syntax match texMathDelim contained conceal cchar=↓ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\downarrow\>"
+  syntax match texMathDelim contained conceal cchar=⇓ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Downarrow\>"
+  syntax match texMathDelim contained conceal cchar=↑ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\uparrow\>"
+  syntax match texMathDelim contained conceal cchar=↑ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Uparrow\>"
+  syntax match texMathDelim contained conceal cchar=↕ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\updownarrow\>"
+  syntax match texMathDelim contained conceal cchar=⇕ "\\\%([bB]igg\?[lr]\?\|left\|right\)\\Updownarrow\>"
 
   if &ambiwidth ==# 'double'
-    syntax match texMathDelim contained conceal cchar=〈 "\\\%([bB]igg\?l\|left\)\\langle"
-    syntax match texMathDelim contained conceal cchar=〉 "\\\%([bB]igg\?r\|right\)\\rangle"
+    syntax match texMathDelim contained conceal cchar=〈 "\\\%([bB]igg\?l\?\|left\)\\langle\>"
+    syntax match texMathDelim contained conceal cchar=〉 "\\\%([bB]igg\?r\?\|right\)\\rangle\>"
   else
-    syntax match texMathDelim contained conceal cchar=⟨ "\\\%([bB]igg\?l\|left\)\\langle"
-    syntax match texMathDelim contained conceal cchar=⟩ "\\\%([bB]igg\?r\|right\)\\rangle"
+    syntax match texMathDelim contained conceal cchar=⟨ "\\\%([bB]igg\?l\?\|left\)\\langle\>"
+    syntax match texMathDelim contained conceal cchar=⟩ "\\\%([bB]igg\?r\?\|right\)\\rangle\>"
   endif
 endfunction
 
@@ -1843,21 +1849,6 @@ function! s:match_conceal_accents() abort " {{{1
       execute 'syntax match texCmdAccent /' . l:re . '/ conceal cchar=' . l:target
     endfor
   endfor
-
-  syntax match texCmdAccent   "\\aa\>" conceal cchar=å
-  syntax match texCmdAccent   "\\AA\>" conceal cchar=Å
-  syntax match texCmdAccent   "\\o\>"  conceal cchar=ø
-  syntax match texCmdAccent   "\\O\>"  conceal cchar=Ø
-  syntax match texCmdLigature "\\AE\>" conceal cchar=Æ
-  syntax match texCmdLigature "\\ae\>" conceal cchar=æ
-  syntax match texCmdLigature "\\oe\>" conceal cchar=œ
-  syntax match texCmdLigature "\\OE\>" conceal cchar=Œ
-  syntax match texCmdLigature "\\ss\>" conceal cchar=ß
-  syntax match texLigature    "--"     conceal cchar=–
-  syntax match texLigature    "---"    conceal cchar=—
-  syntax match texLigature    "``"     conceal cchar=“
-  syntax match texLigature    "''"     conceal cchar=”
-  syntax match texLigature    ",,"     conceal cchar=„
 endfunction
 
 let s:key_accents = [
@@ -1918,10 +1909,37 @@ let s:map_accents = [
       \]
 
 " }}}1
+function! s:match_conceal_ligatures() abort " {{{1
+  syntax match texCmdLigature "\\lq\>" conceal cchar=‘
+  syntax match texCmdLigature "\\rq\>" conceal cchar=′
+  syntax match texCmdLigature "\\i\>"  conceal cchar=ı
+  syntax match texCmdLigature "\\j\>"  conceal cchar=ȷ
+  syntax match texCmdLigature "\\AE\>" conceal cchar=Æ
+  syntax match texCmdLigature "\\ae\>" conceal cchar=æ
+  syntax match texCmdLigature "\\oe\>" conceal cchar=œ
+  syntax match texCmdLigature "\\OE\>" conceal cchar=Œ
+  syntax match texCmdLigature "\\o\>"  conceal cchar=ø
+  syntax match texCmdLigature "\\O\>"  conceal cchar=Ø
+  syntax match texCmdLigature "\\aa\>" conceal cchar=å
+  syntax match texCmdLigature "\\AA\>" conceal cchar=Å
+  syntax match texCmdLigature "\\ss\>" conceal cchar=ß
+  syntax match texLigature    "--"     conceal cchar=–
+  syntax match texLigature    "---"    conceal cchar=—
+  syntax match texLigature    "`"      conceal cchar=‘
+  syntax match texLigature    "'"      conceal cchar=’
+  syntax match texLigature    "``"     conceal cchar=“
+  syntax match texLigature    "''"     conceal cchar=”
+  syntax match texLigature    ",,"     conceal cchar=„
+  syntax match texLigature    "!`"     conceal cchar=¡
+  syntax match texLigature    "?`"     conceal cchar=¿
+endfunction
+
+" }}}1
 function! s:match_conceal_fancy() abort " {{{1
   syntax match texCmd         '\\colon\>' conceal cchar=:
-  syntax match texCmd         '\\dots'    conceal cchar=…
-  syntax match texCmd         '\\ldots'   conceal cchar=…
+  syntax match texCmd         '\\dots\>'  conceal cchar=…
+  syntax match texCmd         '\\slash\>' conceal cchar=/
+  syntax match texCmd         '\\ldots\>' conceal cchar=…
   syntax match texCmdItem     '\\item\>'  conceal cchar=○
   syntax match texTabularChar '\\\\'      conceal cchar=⏎
 endfunction

@@ -20,7 +20,7 @@ set cpoptions&vim
 
 setlocal autoindent
 setlocal indentexpr=VimtexIndentExpr()
-setlocal indentkeys=!^F,o,O,0(,0),0],0},\&,0=\\item,0=\\else,0=\\fi
+setlocal indentkeys=!^F,o,O,0(,0),],},\&,0=\\item,0=\\else,0=\\fi
 
 " Add standard closing math delimiters to indentkeys
 for s:delim in [
@@ -206,7 +206,7 @@ endfunction
 
 let s:envs_begin = '\\begin{.*}\|\\\@<!\\\['
 let s:envs_end = '\\end{.*}\|\\\]'
-let s:envs_ignored = '\v' . join(g:vimtex_indent_ignored_envs, '|')
+let s:envs_ignored = '\v<%(' . join(g:vimtex_indent_ignored_envs, '|') . ')>'
 
 " }}}1
 function! s:indent_items(line, lnum, prev_line, prev_lnum) abort " {{{1
@@ -242,10 +242,8 @@ function! s:indent_delims(line, lnum, prev_line, prev_lnum) abort " {{{1
     return s:sw*(vimtex#util#count(a:prev_line, s:re_open)
           \ - vimtex#util#count(a:prev_line, s:re_close))
   else
-    return s:sw*(  max([  vimtex#util#count(a:prev_line, s:re_open)
-          \             - vimtex#util#count(a:prev_line, s:re_close), 0])
-          \      - max([  vimtex#util#count(a:line, s:re_close)
-          \             - vimtex#util#count(a:line, s:re_open), 0]))
+    return s:sw*(vimtex#util#count_open(a:prev_line, s:re_open, s:re_close)
+          \      - vimtex#util#count_close(a:line, s:re_open, s:re_close))
   endif
 endfunction
 
