@@ -12,6 +12,7 @@ function! vimtex#syntax#p#amsmath#load(cfg) abort " {{{1
   call vimtex#syntax#core#new_region_math('flalign')
   call vimtex#syntax#core#new_region_math('empheq')
   call vimtex#syntax#core#new_region_math('hequation')
+  call vimtex#syntax#core#new_region_math('hanswer')
   call vimtex#syntax#core#new_region_math('gather')
   call vimtex#syntax#core#new_region_math('mathpar')
   call vimtex#syntax#core#new_region_math('multline')
